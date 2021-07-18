@@ -1,0 +1,8 @@
+.idea/**
+project/**
+target/**
+
+*.z3-trace
+*.swp
+*.dylib
+
