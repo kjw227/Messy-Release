@@ -19,7 +19,6 @@ object Parser {
       case t: Token => parseNewString(tokens.tail, builtStr + t.toString)
     }
 
-
   private def parseNewSExpr(tokens: List[Token], SExprs: List[SExpr]): ParseResult = tokens.head match {
       case LParen => val p = parseNewSExpr(tokens.tail, Nil); parseNewSExpr(p.remains, p.result::SExprs)
       case RParen => ParseResult(SExprList(SExprs.reverse), tokens.tail)

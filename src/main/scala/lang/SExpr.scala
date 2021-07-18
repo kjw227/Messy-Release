@@ -5,10 +5,10 @@ sealed trait SExpr {
   override def toString: String = this match {
     case SExprInt(v) => v.toString
     case SExprBool(v) => v.toString
-    case SExprString(s) => s"(String: s)"
-    case SExprBV(v) => s"(BV: #x" + f"$v%08x" + ")"
-    case SExprName(s) => s"(Name: $s)"
-    case SExprList(slist) => val listStr = slist.map(_.toString).mkString(" "); s"(list: $listStr)"
+    case SExprString(s) => s"\"$s\""
+    case SExprBV(v) => "#x" + f"$v%08x"
+    case SExprName(s) => s
+    case SExprList(slist) => val listStr = slist.map(_.toString).mkString(" "); s"($listStr)"
   }
 }
 sealed trait SExprLeaf extends SExpr

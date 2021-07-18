@@ -3,7 +3,7 @@ import org.junit.Test
 
 import scala.io.Source
 
-class TestSuite{
+class LexerTestSuite{
   @Test
   def exampleTest = {
     val example = Source.fromFile("./resources/example.sem").toList
