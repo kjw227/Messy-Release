@@ -53,10 +53,14 @@ object Translator {
     NTDeclaration(ntName, ntType, ntRel)
   }
 
-  def parseNewSynthBlock(termNameArg: SExpr, grmBlockArg: SExpr): SynthBlock = {
+  def parseNewSynthBlock(termNameArg: SExpr, termTypeArg: SExpr, grmBlockArg: SExpr): SynthBlock = {
     val name = termNameArg match {
       case SExprName(s) => s
       case _ => throw new TranslatorException("Malformed synth-term name in synth-term")
+    }
+    val termTp = termTypeArg match {
+      case SExprName(s) => s
+      case _ => throw new TranslatorException("Malformed synth-term term-type in synth-term")
     }
     val cmds = grmBlockArg match {
       case SExprList(slist) => slist.flatMap{parseSExprCommand}
@@ -66,7 +70,7 @@ object Translator {
     val vars = cmds.collect{case x: VarDeclaration => x}
     val prodSets = cmds.collect{case x: ProductionSet => x}
 
-    SynthBlock(name, nts, vars, prodSets)
+    SynthBlock(name, termTp, nts, vars, prodSets)
   }
 
   def parseNewProductionSet(lhsNT: SExpr, lhsRel: SExpr, rhsListArg: List[SExpr]): ProductionSet = {
@@ -131,8 +135,8 @@ object Translator {
         else parseNewNTDeclaration(slist(1), slist(2), slist(3))::Nil
 
       case SExprName("synth-term") =>
-        if (slist.length != 3) throw new TranslatorException("Wrong number of arguments to synth-term")
-        else parseNewSynthBlock(slist(1), slist(2))::Nil
+        if (slist.length != 4) throw new TranslatorException("Wrong number of arguments to synth-term")
+        else parseNewSynthBlock(slist(1), slist(2), slist(3))::Nil
 
       case SExprName("constraint") =>
         if (slist.length != 2) throw new TranslatorException("Wrong number of arguments to constraint")

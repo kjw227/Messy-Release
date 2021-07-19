@@ -5,7 +5,7 @@ version := "0.1"
 scalaVersion := "2.13.6"
 
 libraryDependencies ++= Seq(
-  "org.sosy-lab" % "javasmt-solver-z3" % "z3-4.4.1-788-g8df145d"
+  "com.microsoft.z3" % "java-jar" % "4.8.8"
 )
 
 libraryDependencies ++= Seq(

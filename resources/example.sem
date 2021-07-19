@@ -6,15 +6,14 @@
 (declare-term-type E.Term)
 (declare-term-type B.Term)
 
-(synth-term max2 (
+(synth-term max2 E.Term (
   (declare-var (et et1 et2) E.Term) 
   (declare-var (bt bt1 bt2) B.Term)
   
   (declare-var (x y r r1 r2) Int) ;Var names cannot start with numerals
   (declare-var rb Bool)
   
-  (declare-nt E1 E.Term (E1.Sem E.Term Int Int Int))
-  (declare-nt E2 E.Term (E2.Sem E.Term Int Int Int))
+  (declare-nt E E.Term (E.Sem E.Term Int Int Int))
   (declare-nt B B.Term (B.Sem B.Term Int Int Bool))
   
   (declare-nt A E.Term (A.Sem E.Term Int Int Int))
@@ -59,5 +58,4 @@
 
 (constraint (E.Sem max2 4 2 4))
 (constraint (E.Sem max2 2 5 5))
-
 

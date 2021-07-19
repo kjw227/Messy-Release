@@ -13,11 +13,11 @@ sealed trait Semgus {
       val relArgs = ntRel.args.mkString(" ")
       val relStr = s"($relName $relArgs)"
       s"(declare-nt $ntName $ntType $relStr)"
-    case SynthBlock(name, nts, vars, prods) =>
+    case SynthBlock(name, tp, nts, vars, prods) =>
       val ntStr = nts.mkString("\n")
       val varStr = vars.mkString("\n")
       val prodStr = prods.mkString("\n")
-      s"(synth-term $name\n($ntStr\n$varStr\n$prodStr))"
+      s"(synth-term $name $tp\n($ntStr\n$varStr\n$prodStr))"
     case ProductionSet(lhs, rhsList) => val rhsStr = rhsList.mkString("\n"); s"($lhs\n$rhsStr)"
     case LHS(ntName, ntTerm, ntRel) => s"($ntName $ntTerm) $ntRel"
     case RHS(rhsExp, premises) => val premiseStr = premises.mkString("\n"); s"($rhsExp\n$premiseStr)"
@@ -40,7 +40,7 @@ case class VarDeclaration(varName: String, sortName: Sort) extends Declaration
 case class RelDeclaration(relName: String, args: List[Sort]) extends Declaration
 case class NTDeclaration(ntName: String, ntType: Sort, ntRel: RelDeclaration) extends Declaration
 
-case class SynthBlock(name: String, nts: List[NTDeclaration],
+case class SynthBlock(name: String, termType: Sort, nts: List[NTDeclaration],
                       vars: List[VarDeclaration], prods: List[ProductionSet]) extends Semgus with Command
 
 case class ProductionSet(lhs: LHS, rhsList: List[RHS]) extends Semgus with Command
