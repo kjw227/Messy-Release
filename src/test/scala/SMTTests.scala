@@ -11,7 +11,7 @@ class SMTTestSuite {
   def SMTTest: Unit = {
     val tokens = Lexer.tokenize(Source.fromFile("./resources/example.sem").toList)
     val semgusFile = Translator.parseSemgusFile(Parser.parse(tokens))
-    val consts = genBasic.semgus2SMT(semgusFile)
+    val consts = genBasic.semgus2SMT(semgusFile.purify)
     println(consts.mkString("\n"))
   }
 }

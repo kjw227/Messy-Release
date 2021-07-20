@@ -17,7 +17,6 @@ sealed trait SMT {
   }
 }
 
-
 sealed trait SMTCommand extends SMT
 sealed trait Declaration extends SMTCommand
 sealed trait SMTExpr extends SMTCommand
