@@ -18,7 +18,7 @@
   
   (declare-nt A E.Term (A.Sem E.Term Int Int Int))
   
-  ((E et) (E.Sem et x y r)
+  ((E et) (E.Sem et x y (! r :out))
     (x.Syn (= r x))
     (y.Syn (= r y))
     (0.Syn (= r 0))

@@ -148,7 +148,7 @@ object Translator {
     }
   }
 
-  def parseSemgusFile(s: SExpr): SemgusFile = s match {
+  def parseSemgusFile(s: SExpr): SemgusFile = s.removeAnnotations match {
     case SExprList(slist) => SemgusFile(slist.flatMap(parseSExprCommand))
     case _ => throw new TranslatorException("Top-level Semgus file must consist of a list of commands")
   }
