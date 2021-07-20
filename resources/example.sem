@@ -13,10 +13,10 @@
   (declare-var (x y r r1 r2) Int) ;Var names cannot start with numerals
   (declare-var rb Bool)
   
-  (declare-nt E E.Term (E.Sem E.Term Int Int Int))
-  (declare-nt B B.Term (B.Sem B.Term Int Int Bool))
+  (declare-nt E E.Term (E.Sem (E.Term Int Int Int)))
+  (declare-nt B B.Term (B.Sem (B.Term Int Int Bool)))
   
-  (declare-nt A E.Term (A.Sem E.Term Int Int Int))
+  (declare-nt A E.Term (A.Sem (E.Term Int Int Int)))
   
   ((E et) (E.Sem et x y (! r :out))
     (x.Syn (= r x))

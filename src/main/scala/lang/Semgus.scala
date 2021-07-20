@@ -14,7 +14,7 @@ sealed trait Semgus {
     case NTDeclaration(ntName, ntType, ntRel) =>
       val relName = ntRel.relName
       val relArgs = ntRel.args.mkString(" ")
-      val relStr = s"($relName $relArgs)"
+      val relStr = s"($relName ($relArgs))"
       s"(declare-nt $ntName $ntType $relStr)"
     case SynthBlock(name, tp, nts, vars, prods) =>
       val ntStr = nts.mkString("\n")

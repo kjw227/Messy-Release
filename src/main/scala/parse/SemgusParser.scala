@@ -30,11 +30,18 @@ object Translator {
   }
 
   def parseNewRelDeclaration(args: List[SExpr]): RelDeclaration = {
-    val names = args.map {
-      case SExprName(s) => s
-      case _ => throw new TranslatorException("Malformed argument in declare-rel")
+    val relName = args.head match {
+      case SExprName(name) => name
+      case _ => throw new TranslatorException("Malformed relation name in declare-rel")
     }
-    RelDeclaration(names.head, names.tail)
+    val argSorts = args.tail.head match {
+      case SExprList(slist) => slist.map {
+        case SExprName(name) => name
+        case _ => throw new TranslatorException("Malformed sort argument in declare-rel")
+      }
+      case _ => throw new TranslatorException("Malformed sort block in declare-rel")
+    }
+    RelDeclaration(relName, argSorts)
   }
 
   def parseNewNTDeclaration(ntNameArg: SExpr, ntTypeArg: SExpr, ntRelArg: SExpr): NTDeclaration = {
@@ -128,7 +135,9 @@ object Translator {
         if (slist.length != 3) throw new TranslatorException("Wrong number of arguments to declare-var")
         else parseNewVarDeclaration(slist(1), slist(2))
 
-      case SExprName("declare-rel") => parseNewRelDeclaration(slist.tail)::Nil
+      case SExprName("declare-rel") =>
+        if (slist.length != 3) throw new TranslatorException("Wrong number of arguments to declare-rel")
+        parseNewRelDeclaration(slist.tail)::Nil
 
       case SExprName("declare-nt") =>
         if (slist.length != 4) throw new TranslatorException("Wrong number of arguments to declare-nt")
