@@ -2,7 +2,7 @@
 
 This repository contains `Messy`, a Semgus problem solver based on the CHC-based reduction described in the paper [Semantics-Guided Synthesis](https://dl.acm.org/doi/abs/10.1145/3434311). This is a new version of the solver intended to interface with the current standard [Semgus format](https://semgus-git.github.io/Semgus-Site/res/semgus-lang.pdf); those looking for the artifact should consult [this](https://dl.acm.org/do/10.1145/3410258/abs/) instead.
 
-For more information on Semgus, please consult [this](semgus.org).
+For more information on Semgus, please consult [this](https://semgus.org).
 
 ### Dependencies
 
