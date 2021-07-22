@@ -1,6 +1,8 @@
 ## Messy - CHC-based solver for Semantics-Guided Synthesis
 
-This repository contains `Messy`, a Semgus problem solver based on the CHC-based reduction described in the paper [Semantics-Guided Synthesis](https://dl.acm.org/doi/abs/10.1145/3434311). This is a new version of the solver intended to interface with the current standard Semgus format; those looking for the artifact should consult [this](https://dl.acm.org/do/10.1145/3410258/abs/) instead.
+This repository contains `Messy`, a Semgus problem solver based on the CHC-based reduction described in the paper [Semantics-Guided Synthesis](https://dl.acm.org/doi/abs/10.1145/3434311). This is a new version of the solver intended to interface with the current standard [Semgus format](https://semgus-git.github.io/Semgus-Site/res/semgus-lang.pdf); those looking for the artifact should consult [this](https://dl.acm.org/do/10.1145/3410258/abs/) instead.
+
+For more information on Semgus, please consult [this](semgus.org).
 
 ### Dependencies
 
@@ -18,7 +20,7 @@ sbt assembly
 
 The file `Messy.jar` file will be created under `target/scala-2.13/`.
 
-If you would prefer to avoid installation, you can download a fat JAR from the releases page, which you can run directly instead. You will still need to install `scala, java, z3` separately though.
+If you would prefer to avoid installation, you can download a fat JAR from the releases page, which you can run directly instead. You will still need to install `scala, java, z3` separately.
 
 ### Running Messy
 
