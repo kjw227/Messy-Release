@@ -22,7 +22,7 @@ If you would prefer to avoid installation, you can download a fat JAR from the r
 
 ### Running Messy
 
-To run Messy on its default setting, run: `scala Messy.jar -i ` <PATH-TO-INPUT-SEMGUS-FILE>. This will automatically produce an SMT file `out.z3`, upon which Messy will automatically invoke `z3` to try and solve.
+To run Messy on its default setting, run: `scala Messy.jar -i <PATH-TO-INPUT-SEMGUS-FILE>`. This will automatically produce an SMT file `out.z3`, upon which Messy will automatically invoke `z3` to try and solve.
 
 #### Flags
 
