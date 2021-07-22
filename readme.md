@@ -26,6 +26,8 @@ If you would prefer to avoid installation, you can download a fat JAR from the r
 
 To run Messy on its default setting, run: `scala Messy.jar -i <PATH-TO-INPUT-SEMGUS-FILE>`. This will automatically produce an SMT file `out.z3`, upon which Messy will automatically invoke `z3` to try and solve.
 
+If the problem is realizable, then Messy will show `sat`. If not (i.e., the synthesis problem has no solution) Messy will show `unsat`.
+
 #### Flags
 
 Messy currently supports 4 flags:
