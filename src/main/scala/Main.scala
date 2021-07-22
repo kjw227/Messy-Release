@@ -14,7 +14,7 @@ object Main {
     val infile = opt[String](required = true)
     val outfile = opt[String](default = Some("out.z3"))
     val norun = opt[Boolean](default = Some(false))
-    val timeout = opt[Int](default = Some(60))
+    val timeout = opt[Int](default = Some(10))
 
     verify()
   }
