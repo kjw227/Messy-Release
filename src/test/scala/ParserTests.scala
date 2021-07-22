@@ -14,7 +14,6 @@ class ParserTestSuite{
 }
 
 class TranslatorTestSuite{
-  @Test
   def exampleTest: Unit = {
     val tokens = Lexer.tokenize(Source.fromFile("./resources/example.sem").toList)
     val semgusFileStr = Translator.parseSemgusFile(Parser.parse(tokens)).toString

@@ -7,18 +7,21 @@ object Lexer {
   private val whitespace = Set(' ', '\n', '\r', '\t')
   private val quotes = Set('"')
 
-  def recursiveTokenize(input: List[Char], currentStr: String): List[Token] = {
+  @scala.annotation.tailrec
+  def recursiveTokenize(input: List[Char], currentStr: String, tokenList: List[Token]): List[Token] = {
     input match {
       case c::remains =>
-        if (c == '(') StrToken(currentStr)::LParen::recursiveTokenize(remains, "")
-        else if (c == ')') StrToken(currentStr)::RParen::recursiveTokenize(remains, "")
-        else if (c == '"') StrToken(currentStr)::Quote::recursiveTokenize(remains, "")
-        else if (c == ' ' || c == '\t') StrToken(currentStr)::Whitespace::recursiveTokenize(remains, "")
-        else if (c == '\n' || c == '\r') StrToken(currentStr)::Newline::recursiveTokenize(remains, "")
-        else if (c == ';') StrToken(currentStr)::SemiColon::recursiveTokenize(remains, "")
-        else recursiveTokenize(remains, currentStr.appended(c))
-      case Nil => Nil
+        if (c == '(') recursiveTokenize(remains, "", LParen::StrToken(currentStr)::tokenList)
+        else if (c == ')') recursiveTokenize(remains, "", RParen::StrToken(currentStr)::tokenList)
+        else if (c == '"') recursiveTokenize(remains, "", Quote::StrToken(currentStr)::tokenList)
+        else if (c == ' ' || c == '\t')
+          recursiveTokenize(remains, "", Whitespace::StrToken(currentStr)::tokenList)
+        else if (c == '\n' || c == '\r')
+          recursiveTokenize(remains, "", Newline::StrToken(currentStr)::tokenList)
+        else if (c == ';') recursiveTokenize(remains, "", SemiColon::StrToken(currentStr)::tokenList)
+        else recursiveTokenize(remains, currentStr.appended(c), tokenList)
+      case Nil => tokenList.reverse
     }
   }
-  def tokenize(input: List[Char]): List[Token] = recursiveTokenize(input, "").filter(t => !t.isEmpty)
+  def tokenize(input: List[Char]): List[Token] = recursiveTokenize(input, "", Nil).filter(t => !t.isEmpty)
 }

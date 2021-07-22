@@ -5,7 +5,7 @@ version := "0.1"
 scalaVersion := "2.13.6"
 
 libraryDependencies ++= Seq(
-  "com.microsoft.z3" % "java-jar" % "4.8.8"
+  "org.rogach" %% "scallop" % "4.0.4"
 )
 
 libraryDependencies ++= Seq(
