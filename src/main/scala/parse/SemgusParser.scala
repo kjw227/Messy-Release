@@ -6,14 +6,7 @@ import lang.Semgus._
 class TranslatorException(message: String) extends Exception(message)
 
 object Translator {
-  def parseNewMetadata(tag: SExpr, data: SExpr): Metadata = ???
-
   def parseNewSortDeclaration(): SortDeclaration = ???
-
-  def parseNewTermDeclaration(termName: SExpr): TermDeclaration = termName match {
-    case SExprName(s) => TermDeclaration(s)
-    case _ => throw new TranslatorException("Malformed term name in declare-term")
-  }
 
   def parseNewVarDeclaration(varNameArgs: SExpr, sortNameArg: SExpr): List[VarDeclaration] = {
     val varNames = varNameArgs match {
@@ -60,7 +53,7 @@ object Translator {
     NTDeclaration(ntName, ntType, ntRel)
   }
 
-  def parseNewSynthBlock(termNameArg: SExpr, termTypeArg: SExpr, grmBlockArg: SExpr): SynthBlock = {
+  def parseNewSynthBlock(termNameArg: SExpr, termTypeArg: SExpr, grmBlockArg: SExpr): SynthFun = {
     val name = termNameArg match {
       case SExprName(s) => s
       case _ => throw new TranslatorException("Malformed synth-term name in synth-term")
@@ -75,18 +68,18 @@ object Translator {
     }
     val nts = cmds.collect{case x: NTDeclaration => x}
     val vars = cmds.collect{case x: VarDeclaration => x}
-    val prodSets = cmds.collect{case x: ProductionSet => x}
+    val prodSets = cmds.collect{case x: LHSProductionSet => x}
 
-    SynthBlock(name, termTp, nts, vars, prodSets)
+    SynthFun(name, termTp, ???)
   }
 
-  def parseNewProductionSet(lhsNT: SExpr, lhsRel: SExpr, rhsListArg: List[SExpr]): ProductionSet = {
+  def parseNewProductionSet(lhsNT: SExpr, lhsRel: SExpr, rhsListArg: List[SExpr]): LHSProductionSet = {
     val lhs = parseNewLHS(lhsNT, lhsRel)
     val rhsList = rhsListArg.map{
       case SExprList(rhsExp::rhsPremises) => parseNewRHS(rhsExp, rhsPremises)
       case _ => throw new TranslatorException("Malformed RHS in nonterminal expression")
     }
-    ProductionSet(lhs, rhsList)
+    LHSProductionSet(lhs, rhsList)
   }
 
   def parseNewLHS(ntArg: SExpr, relArg: SExpr): LHS = {
@@ -95,18 +88,18 @@ object Translator {
       case _ => throw new TranslatorException(s"Malformed LHS nonterminal expression")
     }
     val rel = parseNewSMTFormula(relArg)
-    LHS(lhsName, lhsTerm, rel)
+    LHS(NonTerminal(lhsName, lhsName))
   }
 
   def parseNewRHS(expArg: SExpr, premisesArg: List[SExpr]): RHS =
-    RHS(parseNewRHSExp(expArg), premisesArg.map{parseNewSMTFormula})
+    RHS(parseNewRHSExp(expArg))
 
   def parseNewRHSExp(expArg: SExpr): RHSExp = expArg match {
-      case SExprList(SExprName(ntName)::SExprName(ntTerm)::Nil) => RHSNT(ntName, ntTerm)
+      case SExprList(SExprName(ntName)::SExprName(ntTerm)::Nil) => RHSNT(NonTerminal(ntName, ntName))
       case SExprName(leafName) => RHSLeaf(leafName)
       case SExprList(SExprName(opName)::operandList) =>
         val args = operandList.map{
-          case SExprList(SExprName(ntName)::SExprName(ntTerm)::Nil) => RHSNT(ntName, ntTerm)
+          case SExprList(SExprName(ntName)::SExprName(ntTerm)::Nil) => RHSNT(NonTerminal(ntName, ntName))
           case SExprName(leafName) => RHSLeaf(leafName)
           case _ => throw new TranslatorException("Only nonterminals and leafs are allowed as operands of an RHS")
         }
@@ -118,18 +111,10 @@ object Translator {
 
   def parseNewConstraint(fArg: SExpr): Constraint = Constraint(parseNewSMTFormula(fArg))
 
-  def parseSExprCommand(s: SExpr): List[Command] = s match {
+  def parseSExprCommand(s: SExpr): List[SemgusElement] = s match {
     case _: SExprLeaf => throw new TranslatorException("Encountered S-Expression leaf where command was expected")
     case SExprList(slist) => slist.head match {
-      case SExprName("metadata") =>
-        if (slist.length != 3) throw new TranslatorException("Wrong number of arguments to metadata")
-        else Nil
-
       case SExprName("declare-sort") => parseNewSortDeclaration()::Nil
-
-      case SExprName("declare-term-type") =>
-        if (slist.length != 2) throw new TranslatorException("Wrong number of arguments to declare-term-type")
-        else parseNewTermDeclaration(slist.tail.head)::Nil
 
       case SExprName("declare-var") =>
         if (slist.length != 3) throw new TranslatorException("Wrong number of arguments to declare-var")

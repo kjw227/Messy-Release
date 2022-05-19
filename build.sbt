@@ -2,10 +2,13 @@ name := "Messy"
 
 version := "0.1"
 
-scalaVersion := "2.13.6"
+scalaVersion := "2.13.8"
+
+resolvers += "jitpack" at "https://jitpack.io"
 
 libraryDependencies ++= Seq(
-  "org.rogach" %% "scallop" % "4.0.4"
+  "org.rogach" %% "scallop" % "4.0.4",
+  "com.github.SemGuS-git" % "Semgus-Java" % "1.0.1"
 )
 
 libraryDependencies ++= Seq(
@@ -21,4 +24,6 @@ scalacOptions ++= Seq(
 fork := false
 
 assemblyJarName in assembly := "Messy.jar"
+
+Global / serverConnectionType := ConnectionType.Tcp
 

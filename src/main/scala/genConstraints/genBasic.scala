@@ -26,9 +26,9 @@ object genBasic {
       case RHSLeaf(leafName) => SMTFormula(leafName)
     }}
 
-  private def addSyntacticConstraints(prods: List[ProductionSet]): List[ProductionSet] = prods.map{prod =>
+  private def addSyntacticConstraints(prods: List[LHSProductionSet]): List[LHSProductionSet] = prods.map{ prod =>
     val lhsTerm = prod.lhs.ntTerm
-    ProductionSet(prod.lhs, prod.rhsList.map{rhs => RHS(rhs.rhsExp, rhs.premises.map{p =>
+    LHSProductionSet(prod.lhs, prod.rhsList.map{ rhs => RHS(rhs.rhsExp, rhs.premises.map{ p =>
       val rhsTerm = genRHSTerm(rhs)
       val synConst = s"(= $lhsTerm $rhsTerm)"
       SMTFormula(s"(and $synConst $p)")
@@ -39,7 +39,7 @@ object genBasic {
   def genNTCtxt(ntDecls: List[NTDeclaration]): NTCtxt = ntDecls.foldLeft(Map(): NTCtxt){
     (ctxt, ntDecl) => ctxt + (ntDecl.ntName -> ntDecl.ntType)
   }
-  def genLeafCtxt(ntCtxt: NTCtxt)(prods: List[ProductionSet]): LeafCtxt = prods.foldLeft(Map(): LeafCtxt){
+  def genLeafCtxt(ntCtxt: NTCtxt)(prods: List[LHSProductionSet]): LeafCtxt = prods.foldLeft(Map(): LeafCtxt){
     (ctxt, prod) => prod.rhsList.foldLeft(ctxt){(rctxt, rhs) => rhs.rhsExp match{
       case _: RHSOp => rctxt
       case _: RHSNT => rctxt
@@ -61,7 +61,7 @@ object genBasic {
     case RHSLeaf(leafName) => SMTLeafConstructor(leafName)
   }
 
-  def genDatatypeDecl(ntCtxt: NTCtxt)(leafCtxt: LeafCtxt)(prods: List[ProductionSet]): SMTRecDatatypeDeclaration = {
+  def genDatatypeDecl(ntCtxt: NTCtxt)(leafCtxt: LeafCtxt)(prods: List[LHSProductionSet]): SMTRecDatatypeDeclaration = {
     val constructorMap = prods.foldLeft(Map(): DeclCtxt){(constMap, prodSet) =>
       val rhsConsts = prodSet.rhsList.map{r => genConstructorFromRHSExp(ntCtxt)(leafCtxt)(r.rhsExp)}.toSet
       val lhsType = ntCtxt(prodSet.lhs.ntName)
@@ -72,7 +72,7 @@ object genBasic {
       constructorMap.toList.map{case (termType, consts) => SMTDatatypeDeclaration(termType, consts.toList)})
   }
 
-  def genCHCs(prods: List[ProductionSet]): List[CHCRule] =
+  def genCHCs(prods: List[LHSProductionSet]): List[CHCRule] =
     prods.flatMap{prod => prod.rhsList.flatMap{rhs => rhs.premises.map{premise =>
       CHCRule(SMTFormulaHolder(premise.formula), SMTFormulaHolder(prod.lhs.ntRel.formula))
     }}}
@@ -92,20 +92,20 @@ object genBasic {
   def semgus2SMT(semgusFile: SemgusFile): List[SMTCommand] = {
     val ntDecls = semgusFile.commands.collect{
       case n: NTDeclaration => n::Nil
-      case s: SynthBlock => s.nts
+      case s: SynthFun => s.nts
     }.flatten
-    val prods = addSyntacticConstraints(semgusFile.commands.collect{case s: SynthBlock => s.prods}.flatten)
+    val prods = addSyntacticConstraints(semgusFile.commands.collect{case s: SynthFun => s.prods}.flatten)
     val ntCtxt = genNTCtxt(ntDecls)
     val leafCtxt = genLeafCtxt(ntCtxt)(prods)
 
-    val funName = semgusFile.commands.collect{case s: SynthBlock => SMTVarDeclaration(s.name, s.termType)}
+    val funName = semgusFile.commands.collect{case s: SynthFun => SMTVarDeclaration(s.name, s.termType)}
     val varDecls = funName:::semgusFile.commands.collect{
       case v: VarDeclaration => v::Nil
-      case s: SynthBlock => s.vars
+      case s: SynthFun => s.vars
     }.flatten.map{genVarDecl}
     val relDecls = realizableDecl::semgusFile.commands.collect{
       case r: RelDeclaration => r::Nil
-      case s: SynthBlock => s.nts.map{_.ntRel}
+      case s: SynthFun => s.nts.map{_.ntRel}
     }.flatten.map{genRelDecl}
     val datatypeDecls = genDatatypeDecl(ntCtxt)(leafCtxt)(prods)
 
