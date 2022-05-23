@@ -23,7 +23,3 @@ scalacOptions ++= Seq(
 )
 fork := false
 
-assemblyJarName in assembly := "Messy.jar"
-
-Global / serverConnectionType := ConnectionType.Tcp
-

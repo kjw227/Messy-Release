@@ -39,8 +39,5 @@ object Main {
     val ofName = conf.outfile()
     val tokens = Lexer.tokenize(Source.fromFile(ifName).toList)
     val semgusFile = Translator.parseSemgusFile(Parser.parse(tokens))
-    val SMTConsts = genBasic.semgus2SMT(semgusFile.purify)
-    new PrintWriter(ofName){write(SMTConsts.mkString("\n")); close}
-    if (conf.norun()) () else callZ3(ofName, conf.timeout())
   }
 }

@@ -18,19 +18,24 @@ sealed trait SemgusElement {
       val grmStr = grm.mkString("\n")
       s"(synth-term $name $tp\n($grmStr)\n)\n"
     case LHSProductionSet(lhs, rhsList) => val rhsStr = rhsList.mkString("\n"); s"($lhs\n$rhsStr)"
-    case NonTerminal(ntName, ntType) => s"(nonterminal $ntName $ntType)"
+    case Nonterminal(ntName, ntType) => s"(nonterminal $ntName $ntType)"
     case LHS(nt) => s"($nt)"
     case RHS(rhsExp) => s"($rhsExp)"
     case RHSOp(opName, args) => val argStr = args.mkString(" "); s"($opName $argStr)"
     case RHSNT(ntName) => s"$ntName"
     case RHSLeaf(leafName) => leafName
-    case SemanticCHC(head, tail) => s"(rule ($head) ($tail))"
+    case SemanticCHC(decl, vars, head, tail) => s"(rule ($head) ($tail))"
+    case Variable(name, tp) => s""
     case SMTFormula(formula) => formula
     case Constraint(formula) => s"(constraint $formula)"
   }
 }
 
-sealed trait Declaration extends SemgusElement
+sealed trait SemgusEvent extends SemgusElement{
+  override def purify: SemgusEvent
+}
+
+sealed trait Declaration extends SemgusEvent
 case class SortDeclaration(sortName: Sort) extends Declaration {
   override def purify: SortDeclaration = SortDeclaration(purifyName(sortName))
 }
@@ -44,19 +49,19 @@ case class NTDeclaration(ntName: String, ntType: Sort, ntRel: RelDeclaration) ex
   override def purify: NTDeclaration = NTDeclaration(purifyName(ntName), purifyName(ntType), ntRel.purify)
 }
 
-case class SynthFun(name: String, termType: Sort, grm: List[LHSProductionSet]) extends SemgusElement {
+case class SynthFun(name: String, termType: Sort, grm: List[LHSProductionSet]) extends SemgusEvent {
   override def purify: SynthFun =
     SynthFun(purifyName(name), purifyName(termType), grm.map{_.purify})
 }
 
 
-case class LHSProductionSet(lhs: LHS, rhsList: List[RHS]) extends SemgusElement {
+case class LHSProductionSet(lhs: LHS, rhsList: List[RHS]) extends SemgusEvent {
   override def purify: LHSProductionSet = LHSProductionSet(lhs.purify, rhsList.map{_.purify})
 }
-case class NonTerminal(ntName: String, ntType: Sort) extends SemgusElement {
-  override def purify: NonTerminal = NonTerminal(purifyName(ntName), purifyName(ntType))
+case class Nonterminal(ntName: String, ntType: Sort) extends SemgusElement {
+  override def purify: Nonterminal = Nonterminal(purifyName(ntName), purifyName(ntType))
 }
-case class LHS(nt: NonTerminal) extends SemgusElement {
+case class LHS(nt: Nonterminal) extends SemgusElement {
   override def purify: LHS = LHS(nt.purify)
 }
 case class RHS(rhsExp: RHSExp) extends SemgusElement {
@@ -71,25 +76,30 @@ sealed trait RHSAtom extends RHSExp {
 case class RHSOp(opName: String, args: List[RHSAtom]) extends RHSExp {
   override def purify: RHSOp = RHSOp(purifyName(opName), args.map{_.purify})
 }
-case class RHSNT(nt: NonTerminal) extends RHSAtom {
+case class RHSNT(nt: Nonterminal) extends RHSAtom {
   override def purify: RHSNT = RHSNT(nt.purify)
 }
 case class RHSLeaf(leafName: String) extends RHSAtom {
   override def purify: RHSLeaf = RHSLeaf(purifyName(leafName))
 }
 
-case class SemanticCHC(head: SMTFormula, tail: SMTFormula) extends SemgusElement {
-  override def purify: SemgusElement = SemanticCHC(head.purify, tail.purify)
-}
+
 case class SMTFormula(formula: String) extends SemgusElement {
   override def purify: SMTFormula = this
 }
+case class SemanticCHC(decl: RelDeclaration, vars: Set[Variable], head: SMTFormula, tail: SMTFormula)
+  extends SemgusEvent {
+  override def purify: SemanticCHC = SemanticCHC(decl.purify, vars.map{_.purify}, head.purify, tail.purify)
+}
+case class Variable(name: String, tp: Sort) extends SemgusElement {
+  override def purify: Variable = Variable(purifyName(name), tp)
+}
 
-case class Constraint(formula: SMTFormula) extends SemgusElement {
+case class Constraint(formula: SMTFormula) extends SemgusEvent {
   override def purify: Constraint = Constraint(formula.purify)
 }
 
-case class SemgusFile(commands: List[SemgusElement]) {
+case class SemgusFile(commands: List[SemgusEvent]) {
   def purify: SemgusFile = SemgusFile(commands.map{_.purify})
   override def toString: String = commands.mkString("\n")
 }
