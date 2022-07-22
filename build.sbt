@@ -23,3 +23,5 @@ scalacOptions ++= Seq(
 )
 fork := false
 
+assembly / assemblyJarName := "Messy-1.0-fat.jar"
+

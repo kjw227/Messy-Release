@@ -14,7 +14,7 @@ package object semgusJava {
   def readJSONfromFile(fname: String): String = {
     val file = scala.io.Source.fromFile(fname)
     val jsonstr = file.mkString("")
-    file.close(); utils.printGreen(jsonstr); jsonstr
+    file.close(); jsonstr
   }
 
   def typedVarWithTypeStr(v: org.semgus.java.`object`.TypedVar): String = {
@@ -65,15 +65,12 @@ package object semgusJava {
     val headVars = h.head.arguments.asScala.map{
       tv => Variable(tv.name, tv.`type`.toString)}.toSet
     val headRels = relationAppStr(h.head)
-    utils.printMagenta(headRels)
     val premiseRels = h.bodyRelations.asScala.map{relationAppStr}.mkString(" ")
-    utils.printMagenta(premiseRels)
     val relVars = h.bodyRelations.asScala.foldLeft(Set(): Set[Variable]){
       case (relAcc, rel) => rel.arguments.asScala.foldLeft(Set(): Set[Variable]){
         case (varAcc, v) => varAcc + Variable(v.name, v.`type`.toString)}.union(relAcc)}
 
     val constraint = constraint2Str(h.constraint)
-    utils.printYellow(constraint)
     val premise = s"(and $premiseRels $constraint)"
     SemanticCHC(decl, headVars.union(relVars), SMTFormula(premise), SMTFormula(headRels))
   }
