@@ -7,41 +7,34 @@ For more information on Semgus, please consult [this](https://semgus.org).
 ### Dependencies
 
 ```
-scala, java (>= 1.8), sbt, z3
+scala, java (>= 1.8), z3, Semgus-Parser
 ```
 
-### Installation
-
-Install the dependencies, clone the repo, then run:
-
-```
-sbt assembly
-```
-
-The file `Messy.jar` file will be created under `target/scala-2.13/`.
-
-If you would prefer to avoid installation, you can download a fat JAR from the releases page, which you can run directly instead. You will still need to install `scala, java, z3` separately.
+`Messy` also has dependencies on external libraries such as Scallop and SemgusJava. This should not be a concern if you are running Messy within sbt, or through the provided fat JAR.
 
 ### Running Messy
 
-To run Messy on its default setting, run: `scala Messy.jar -i <PATH-TO-INPUT-SEMGUS-FILE>`. This will automatically produce an SMT file `out.z3`, upon which Messy will automatically invoke `z3` to try and solve.
+To run Messy, download the fat JAR from the releases page, and run:
+```
+`scala Messy.jar -i <PATH-TO-INPUT-SEMGUS-FILE>
+```
+This will produce an SMT file `out.z3`, upon which an external CHC solver (such as Z3) can be run.
 
-If the problem is realizable, then Messy will show `sat`. If not (i.e., the synthesis problem has no solution) Messy will show `unsat`.
+The input to Messy should not be a raw SemGuS file, but a SemGuS file parsed to the JSON representation. For this, we recommend the parser hosted at (https://github.com/SemGuS-git/Semgus-Parser).
 
-#### Flags
-
-Messy currently supports 4 flags:
+### Flags
 
 `--infile, -i`: Input Semgus file to solve.
 
 `--outfile, -o`: Output SMT file. Defaults to `out.z3`.
 
-`--norun, -n`: Do not automatically run `z3` on the produced SMT file. Use this if you want to try out other CHC solvers.
+### Installation
 
-`--timeout, -t`: The timeout setting for running `z3` on the produced SMT file. Defaults to 10 seconds.
+If you wish to tweak with Messy directly, you should first install `sbt` and clone the repo. After that, 
+run `sbt assembly` to produce the fat JAR on the releases page, or `sbt run` to run Messy directly from within `sbt`.
 
 ### Caveats
 
 - Messy is currently unable to produce synthesized programs for realizable synthesis problems (even if it can prove that the generated CHC file is `sat`). This is because support for recursive datatypes and non-linear CHCs in `z3` is still highly experimental and will often crash when asked for proof witnesses, from which an actual program can be extracted.
-- Messy currently does not support the list / array encoding described in the [paper](https://dl.acm.org/doi/abs/10.1145/3434311), and encodes syntactic representations of terms using algebraic datatypes. This functionality will be added in the future.
+- Messy currently does not support the list / array encoding described in the [paper](https://dl.acm.org/doi/abs/10.1145/3434311), and encodes syntactic representations of terms using algebraic datatypes. This functionality is expected to be added in the future.
 
